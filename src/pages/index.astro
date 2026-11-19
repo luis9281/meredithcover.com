@@ -1,17 +1,241 @@
 ---
+// Fecha de lanzamiento de la nueva web (UTC-5). Cambia aquí para mover la cuenta regresiva.
+const LAUNCH = '2026-11-21T09:00:00-05:00';
+const domain = 'meredithcover.com';
 ---
 
 <html lang="es">
 	<head>
 		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Meredith Cover</title>
+		<title>Meredith Cover — Muy pronto</title>
+		<meta name="description" content="La nueva web de Meredith Cover está en construcción. Muy pronto en línea." />
+		<meta name="robots" content="noindex" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=JetBrains+Mono:wght@400;600&display=swap"
+			rel="stylesheet"
+		/>
 	</head>
 	<body>
-		<h1>Meredith Cover</h1>
-		<p>Portafolio de servicios — próximamente.</p>
+		<div class="tape" aria-hidden="true"></div>
+
+		<main>
+			<p class="eyebrow"><span class="dot" aria-hidden="true"></span> Sitio en construcción</p>
+
+			<h1>{domain}</h1>
+
+			<p class="lead">
+				Estamos preparando un nuevo espacio para presentar nuestros servicios.<br />
+				Vuelve pronto: la nueva web estará lista en
+			</p>
+
+			<div class="countdown" id="countdown" data-launch={LAUNCH} role="timer" aria-live="off">
+				<div class="unit"><span class="num" data-k="d">00</span><span class="lbl">Días</span></div>
+				<span class="sep" aria-hidden="true">:</span>
+				<div class="unit"><span class="num" data-k="h">00</span><span class="lbl">Horas</span></div>
+				<span class="sep" aria-hidden="true">:</span>
+				<div class="unit"><span class="num" data-k="m">00</span><span class="lbl">Minutos</span></div>
+				<span class="sep" aria-hidden="true">:</span>
+				<div class="unit"><span class="num" data-k="s">00</span><span class="lbl">Segundos</span></div>
+			</div>
+
+			<div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+
+			<p class="done" id="done" hidden>¡La nueva web ya está casi lista! Recarga en unos minutos.</p>
+		</main>
+
+		<footer>© {new Date().getFullYear()} Meredith Cover</footer>
+
+		<div class="tape tape--bottom" aria-hidden="true"></div>
+
+		<script>
+			const el = document.getElementById('countdown')!;
+			const launch = new Date(el.dataset.launch!).getTime();
+			// Inicio de la cuenta (2 días antes del lanzamiento) para la barra de progreso.
+			const start = launch - 2 * 24 * 60 * 60 * 1000;
+			const bar = document.getElementById('bar')!;
+			const done = document.getElementById('done')!;
+			const nums = Object.fromEntries(
+				[...el.querySelectorAll<HTMLElement>('[data-k]')].map((n) => [n.dataset.k, n]),
+			);
+			const pad = (n: number) => String(n).padStart(2, '0');
+
+			function tick() {
+				const now = Date.now();
+				const diff = Math.max(0, launch - now);
+				const s = Math.floor(diff / 1000);
+				nums.d.textContent = pad(Math.floor(s / 86400));
+				nums.h.textContent = pad(Math.floor((s % 86400) / 3600));
+				nums.m.textContent = pad(Math.floor((s % 3600) / 60));
+				nums.s.textContent = pad(s % 60);
+				const pct = Math.min(100, Math.max(0, ((now - start) / (launch - start)) * 100));
+				bar.style.width = pct.toFixed(2) + '%';
+				if (diff === 0) {
+					done.hidden = false;
+					clearInterval(timer);
+				}
+			}
+			const timer = setInterval(tick, 1000);
+			tick();
+		</script>
+
+		<style>
+			:root {
+				--bg: #f4efe6;
+				--ink: #1d1a16;
+				--muted: #6b6257;
+				--accent: #e0a31a;
+				--card: #fffaf1;
+				--line: #e3d9c8;
+			}
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--bg: #15130f;
+					--ink: #f3ece0;
+					--muted: #a59a8a;
+					--accent: #f0b52a;
+					--card: #1f1c17;
+					--line: #34302a;
+				}
+			}
+			* { box-sizing: border-box; }
+			html, body { margin: 0; height: 100%; }
+			body {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				background: var(--bg);
+				color: var(--ink);
+				font-family: 'Fraunces', Georgia, serif;
+			}
+			.tape {
+				height: 14px;
+				background: repeating-linear-gradient(-45deg, var(--accent) 0 18px, var(--ink) 18px 36px);
+				background-size: 51px 14px;
+				animation: slide 2s linear infinite;
+			}
+			.tape--bottom { animation-direction: reverse; }
+			@keyframes slide { to { background-position: 51px 0; } }
+
+			main {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				text-align: center;
+				padding: 48px 16px;
+				gap: 20px;
+			}
+			.eyebrow {
+				margin: 0;
+				display: inline-flex;
+				align-items: center;
+				gap: 10px;
+				font-family: 'JetBrains Mono', ui-monospace, monospace;
+				font-size: 0.8rem;
+				letter-spacing: 0.18em;
+				text-transform: uppercase;
+				color: var(--muted);
+			}
+			.dot {
+				width: 8px; height: 8px; border-radius: 50%;
+				background: var(--accent);
+				animation: pulse 1.6s ease-in-out infinite;
+			}
+			@keyframes pulse { 50% { opacity: 0.25; } }
+
+			h1 {
+				margin: 0;
+				font-weight: 600;
+				font-size: clamp(2.4rem, 9vw, 5.5rem);
+				line-height: 1;
+				letter-spacing: -0.02em;
+				overflow-wrap: anywhere;
+			}
+			.lead {
+				margin: 0;
+				max-width: 34rem;
+				font-size: clamp(1rem, 2.4vw, 1.2rem);
+				line-height: 1.55;
+				color: var(--muted);
+			}
+
+			.countdown {
+				display: flex;
+				align-items: flex-start;
+				gap: clamp(6px, 2vw, 16px);
+				margin-top: 8px;
+			}
+			.unit {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+				min-width: clamp(64px, 18vw, 110px);
+				padding: clamp(12px, 3vw, 20px) clamp(6px, 2vw, 14px);
+				background: var(--card);
+				border: 1px solid var(--line);
+				border-radius: 14px;
+			}
+			.num {
+				font-family: 'JetBrains Mono', ui-monospace, monospace;
+				font-weight: 600;
+				font-size: clamp(1.8rem, 7vw, 3.4rem);
+				line-height: 1;
+				font-variant-numeric: tabular-nums;
+			}
+			.lbl {
+				font-family: 'JetBrains Mono', ui-monospace, monospace;
+				font-size: clamp(0.6rem, 1.8vw, 0.75rem);
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--muted);
+			}
+			.sep {
+				font-family: 'JetBrains Mono', ui-monospace, monospace;
+				font-size: clamp(1.4rem, 5vw, 2.6rem);
+				color: var(--accent);
+				padding-top: clamp(12px, 3vw, 22px);
+			}
+
+			.progress {
+				width: min(100%, 420px);
+				height: 6px;
+				border-radius: 99px;
+				background: var(--line);
+				overflow: hidden;
+			}
+			.bar {
+				height: 100%;
+				width: 0;
+				background: var(--accent);
+				border-radius: inherit;
+				transition: width 1s linear;
+			}
+			.done { margin: 0; font-weight: 600; color: var(--accent); }
+
+			footer {
+				padding: 20px 16px;
+				text-align: center;
+				font-family: 'JetBrains Mono', ui-monospace, monospace;
+				font-size: 0.75rem;
+				color: var(--muted);
+			}
+
+			@media (max-width: 420px) {
+				.sep { display: none; }
+				.countdown { gap: 8px; }
+			}
+			@media (prefers-reduced-motion: reduce) {
+				.tape, .dot { animation: none; }
+				.bar { transition: none; }
+			}
+		</style>
 	</body>
 </html>
